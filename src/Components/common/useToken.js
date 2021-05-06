@@ -1,24 +1,25 @@
-import {useState} from 'react';
+import { useState, useEffect } from "react";
 
-export default function useToken(){
+const getToken = (initialValue) => {
+  const tokenString = JSON.parse(localStorage.getItem("token"));
+  if (tokenString) return tokenString;
+  if (initialValue instanceof Function) return initialValue();
+  console.log("reached getToken()");
+  return initialValue;
+};
 
-    const getToken=()=>{
-        const tokenString = sessionStorage.getItem('token');
-        const userToken = tokenString;
-        return userToken;
-   }
-   
-    const [token,setToken] = useState(getToken());
+const useToken = (initialValue) => {
+  const [token, setToken] = useState(() => {
+    return getToken(initialValue);
+  });
 
-    const saveToken = userToken =>{
-        sessionStorage.setItem('token', userToken);
-        console.log(userToken);
-        setToken(userToken);
-   };
+  useEffect(() => {
+    console.log("token changed");
+    console.log("TOKEN: ", token);
+    localStorage.setItem("token", JSON.stringify(token));
+  }, [token]);
 
-   return {
-       setToken: saveToken,
-       token
-   }
-   
-}
+  return [token, setToken];
+};
+
+export default useToken;
