@@ -13,7 +13,7 @@ function Header() {
         <div>
           <nav className="navbar navbar-expand-lg navbar-light bg-secondary">
             <span className="navbar-brand" href="#" style={{paddingLeft: `2vw`, color: 'white'}}>Articles</span>
-             <NavbarToggler onClick={setisOpen(true)} style={{color: "white"}}><span className="navbar-toggler-icon"></span></NavbarToggler>
+             <NavbarToggler onClick={()=>setisOpen(true)} style={{color: "white"}}><span className="navbar-toggler-icon"></span></NavbarToggler>
              <Collapse isOpen={isOpen} navbar>
               <ul className="navbar-nav">
                 <li className="nav-item active">
