@@ -10,7 +10,7 @@ import useToken from  "./common/useToken";
 
 export default function Main() {
 
-     const {token, setToken} = useToken();
+     const [token, setToken] = useToken("");
 
      useEffect(function(){
        console.log("token state changes");
@@ -18,7 +18,22 @@ export default function Main() {
      },[token])
      
      if(!token){
-          return (<Login setToken={setToken}/>);
+          const LoginPage = ()=>{
+               return(<Login setToken={setToken}/>);
+          }
+          const RegisterPage = ()=>{
+               return(<Register setToken={setToken}/>);
+          }
+          return (
+               <div>
+               <HashRouter>
+                         <Switch>
+                                 <Route exact path = "/" component={LoginPage}/>
+                                 <Route exact path = "/register" component={RegisterPage}/>
+                         </Switch>
+                 </HashRouter>
+          </div> 
+          );
      }
      return(<div>
           <HashRouter>

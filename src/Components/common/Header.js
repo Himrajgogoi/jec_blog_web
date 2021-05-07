@@ -1,9 +1,17 @@
 import React, {useState} from 'react';
+import axios from "axios";
 import { Link,NavLink } from 'react-router-dom';
-import {useDispatch} from  "react-redux";
-import {logoutUser} from "../../actions/auth";
+import {tokenConfig} from "../../actions/auth";
 import { Collapse, NavbarToggler } from 'reactstrap';
 
+// logout user
+async function logoutUser(){
+  const config = tokenConfig();
+
+  var res = await axios.post(`http://127.0.0.1:8000/api/auth/logout`,null, config);
+  return res;
+  
+}
 
 function Header() {
 
@@ -13,7 +21,7 @@ function Header() {
         <div>
           <nav className="navbar navbar-expand-lg navbar-light bg-secondary">
             <span className="navbar-brand" href="#" style={{paddingLeft: `2vw`, color: 'white'}}>Articles</span>
-             <NavbarToggler onClick={()=>setisOpen(true)} style={{color: "white"}}><span className="navbar-toggler-icon"></span></NavbarToggler>
+             <NavbarToggler onClick={()=>setisOpen(!isOpen)} style={{color: "white"}}><span className="navbar-toggler-icon"></span></NavbarToggler>
              <Collapse isOpen={isOpen} navbar>
               <ul className="navbar-nav">
                 <li className="nav-item active">
@@ -26,7 +34,7 @@ function Header() {
                  <Link to="/personal" style={{paddingLeft: `2vw`, color: 'white'}}><span> Personal</span></Link>
                </li>
              </ul>
-             <button type="button"className="bg-primary" style={{marginLeft: `2vw`,color: `white`}}>Logout</button>
+             <button type="button"className="bg-primary" style={{marginLeft: `2vw`,color: `white`}} onClick={()=>logoutUser()}>Logout</button>
                </Collapse>
             </nav>
         </div>
