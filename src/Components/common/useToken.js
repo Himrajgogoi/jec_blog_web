@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const getToken = (initialValue) => {
-  const tokenString = JSON.parse(localStorage.getItem("token"));
+  const tokenString = localStorage.getItem("token");
   if (tokenString) return tokenString;
   if (initialValue instanceof Function) return initialValue();
   console.log("reached getToken()");
@@ -16,7 +16,7 @@ const useToken = (initialValue) => {
   useEffect(() => {
     console.log("token changed");
     console.log("TOKEN: ", token);
-    localStorage.setItem("token", JSON.stringify(token));
+    localStorage.setItem("token", token);
   }, [token]);
 
   return [token, setToken];

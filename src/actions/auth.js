@@ -194,6 +194,7 @@ export const putProfile = (id,data) => (dispatch,getState) => {
 /// configuring the token header
 export const tokenConfig = ()=>{
     const token = localStorage.getItem('token');
+    console.log(token);
 
     //Header
     const config = {
@@ -203,7 +204,7 @@ export const tokenConfig = ()=>{
     }
 
     if(token){
-        config.headers["Authorization"] = `Token ${token}`;
+        config.headers["Authorization"] = `token ${token}`;
     }
     return config;
 }
@@ -222,7 +223,7 @@ export const tokenConfig_multipart = ()=>{
     }
 
     if(token){
-        config.headers["Authorization"] = `Token ${token}`;
+        config.headers["Authorization"] = `token ${token}`;
     }
     return config;
 }

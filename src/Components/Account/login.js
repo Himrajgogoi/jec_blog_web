@@ -7,7 +7,7 @@ import background from "../../images/login-background.jpeg";
 
 
 /// Loggin in user
-async function loginUser(username, password){
+async function loginUser(username, password, setToken, setError){
 
     const config = {
         headers:{
@@ -17,9 +17,14 @@ async function loginUser(username, password){
 
     const body = JSON.stringify({username,password});
 
-    var res = await axios.post(`http://127.0.0.1:8000/api/auth/login`, body, config)
-    console.log(res.data);
-    return res.data;
+    axios.post(`http://127.0.0.1:8000/api/auth/login`, body, config)
+    .then(res=>{
+        setToken(res.data.token);
+    })
+    .catch(err=>{
+       setError("Incorrect username or password");
+    })
+   
         
 }
 
@@ -27,13 +32,12 @@ export default function Login(props) {
 
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
-
+    const [error, setError] = useState(null);
 
 
         const handleSubmit = async e =>{
             e.preventDefault();
-            const data = await loginUser(username,password);
-            props.setToken(data.token);
+            loginUser(username,password, props.setToken, setError);
         }
             return (
                 <div style={{backgroundImage:`url(${background})`, backgroundPosition:"center center", backgroundRepeat:"no repeat",
@@ -46,19 +50,22 @@ export default function Login(props) {
                                 <form onSubmit={handleSubmit}>
                                     <div class="form-group">
                                       <label for="username">Username</label>
-                                       <input type="text" class="form-control" id="username"  placeholder="Enter username" onChange={e=> setUsername(e.target.value)}/>
+                                       <input type="text" className="form-control" id="username"  placeholder="Enter username" onChange={e=> setUsername(e.target.value)}/>
                                     </div>
-                                    <div class="form-group">
+                                    <div className="form-group">
                                       <label for="passwordoftheuser">Password</label>
-                                      <input type="password" class="form-control" id="passwordoftheuser" placeholder="Password" onChange={e=> setPassword(e.target.value)}/>
+                                      <input type="password" className="form-control" id="passwordoftheuser" placeholder="Password" onChange={e=> setPassword(e.target.value)}/>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" className="btn btn-primary">Submit</button>
                                 </form>
                             </div>
                             </div>
+                            <small style={{color: "wheat"}}>Dont have an account?</small><small><Link to="/register"> Register</Link></small>
+                            <div>
+                                 <small style={{color:"red", fontWeight: "bold"}}>{error}</small>
+                            </div>
                         </div>
                     </div>
-                    <small>Dont have an account?</small><small><Link to="/register">Register</Link></small>
                 </div>
              );
    

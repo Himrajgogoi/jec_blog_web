@@ -3,7 +3,7 @@ import axios from "axios";
 import {Link} from "react-router-dom";
 import background from "../../images/login-background.jpeg";
 
-async function registerUser (username, email, password) {
+async function registerUser (username, email, password,setToken, setError) {
     
     const config = {
         headers:{
@@ -13,10 +13,13 @@ async function registerUser (username, email, password) {
 
     const body = JSON.stringify({username,email,password});
 
-    var res = await axios.post(`http://127.0.0.1:8000/api/auth/register`,body,config)
-    console.log(res.data);
-    console.log(res.data.token);
-    return res.data;
+    axios.post(`http://127.0.0.1:8000/api/auth/register`,body,config)
+    .then(res=>{
+        setToken(res.data.token);
+    })
+    .catch(err=>{
+       setError(err.message);
+    })
     
 }
 
@@ -24,12 +27,12 @@ export default function Register(props) {
     const [username, setUsername] = useState(null);
     const [email, setEmail] = useState(null);
     const [password, setPassword] = useState(null);
+    const [error, setError] = useState(null);
 
 
     const handleSubmit = async e =>{
         e.preventDefault();
-        const data = await registerUser(username,email,password);
-        props.setToken(data.token);
+        registerUser(username,email,password, props.setToken, setError);
     }
         return (
             <div style={{backgroundImage:`url(${background})`, backgroundPosition:"center center", backgroundRepeat:"no repeat",
@@ -42,23 +45,24 @@ export default function Register(props) {
                             <form onSubmit={handleSubmit}>
                                 <div class="form-group">
                                   <label for="username">Username</label>
-                                   <input type="text" class="form-control" id="username"  placeholder="Enter username" onChange={e=> setUsername(e.target.value)}/>
+                                   <input type="text" className="form-control" id="username"  placeholder="Enter username" onChange={e=> setUsername(e.target.value)}/>
                                 </div>
                                 <div class="form-group">
                                   <label for="username">Email</label>
-                                   <input type="email" class="form-control" id="username"  placeholder="Enter username" onChange={e=> setEmail(e.target.value)}/>
+                                   <input type="email" className="form-control" id="username"  placeholder="Enter username" onChange={e=> setEmail(e.target.value)}/>
                                 </div>
                                 <div class="form-group">
                                   <label for="passwordoftheuser">Password</label>
-                                  <input type="password" class="form-control" id="passwordoftheuser" placeholder="Password" onChange={e=> setPassword(e.target.value)}/>
+                                  <input type="password" className="form-control" id="passwordoftheuser" placeholder="Password" onChange={e=> setPassword(e.target.value)}/>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="submit" className="btn btn-primary">Submit</button>
                             </form>
                         </div>
                         </div>
+                        <small style={{color: "wheat"}} >Have an account?</small><small><Link to="/login"> Login</Link></small>
+                        <small style={{color:"red", fontWeight: "bold"}}>{error}</small>
                     </div>
                 </div> 
-                <small>Already have an account?</small><Link to="/"><small>Login</small></Link>
             </div>
          );
 }
