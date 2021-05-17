@@ -121,3 +121,10 @@ footer{
   max-height: 55vh;
 }
 
+.loader{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+

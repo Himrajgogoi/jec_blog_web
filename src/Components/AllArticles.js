@@ -6,12 +6,14 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import image from "../images/article.jpg";
 import Footer from "./common/Footer";
+import { Loading } from "./common/Loading";
 
 function Allarticles() {
   const [data, setData] = useState([]);
   const [searched, setSearch] = useState([]);
   const [word, setWord] = useState("");
   const [err, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(async function () {
     // personal articles
@@ -22,9 +24,11 @@ function Allarticles() {
         .get(`${port}/api/articles/`, config)
         .then((res) => {
           setData(res.data);
+          setLoading(false);
         })
         .catch((err) => {
           setError("An error occured. Try logging in again");
+          setLoading(false);
         });
     }
     getAllArticles();
@@ -48,10 +52,21 @@ function Allarticles() {
         return found ? true : false;
       })
     );
-    console.log(data);
   };
 
-  if (err == null) {
+  if (err == null  && loading == false) {
+    if(data == []) return(
+      <div className="backcolor">
+      <Header />
+      <div>
+        <div className="content">
+          <h5 style={{ textAlign: "center", justifyContent: "center", color: "grey" }}>Nothing has been posted yet.</h5>
+        </div>
+      </div>
+      <Footer />
+    </div>
+    )
+    else 
     return (
       <div className="backcolor">
         <Header />
@@ -153,7 +168,16 @@ function Allarticles() {
         <Footer />
       </div>
     );
-  } else {
+  } else if (loading) {
+    return (
+      <div className="backcolor">
+        <Header />
+         <Loading/>
+        <Footer />
+      </div>
+    );
+  } 
+  else if (err !== null && loading == false) {
     return (
       <div className="backcolor">
         <Header />

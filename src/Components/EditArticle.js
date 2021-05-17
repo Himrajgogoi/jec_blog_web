@@ -1,5 +1,6 @@
 import React,{useState, useEffect} from 'react'
 import { tokenConfig, tokenConfig_multipart } from "../actions/auth";
+import {useHistory} from "react-router-dom";
 import { port } from "../actions/port";
 import axios from "axios";
 import Header from "./common/Header";
@@ -23,6 +24,7 @@ async function putArticle (id,data){
 function EditArticle(props) {
 
     const data = new FormData();
+    const history = useHistory();
 
     const [article, setArticle] = useState({});
     const [err, setError] = useState(null);
@@ -50,7 +52,15 @@ function EditArticle(props) {
     const handleSubmit = e =>{
         e.preventDefault();
         data.append('username', article.username);
+        if(data.get('header') == null){
+            data.append('header', article.header);
+        }
+        if(data.get('textArea') == null){
+            data.append('textArea', article.textArea);
+        }
         putArticle(props.id,data);
+        history.push('/')
+        window.location.reload();
     }
     if(err == null){
         return(<div>

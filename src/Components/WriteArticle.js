@@ -1,10 +1,10 @@
 import React,{useState, useEffect} from 'react'
 import { tokenConfig, tokenConfig_multipart } from "../actions/auth";
+import {useHistory} from "react-router-dom";
 import { port } from "../actions/port";
 import axios from "axios";
 import Header from "./common/Header";
 import Footer from "./common/Footer";
-import { Redirect } from 'react-router';
 
 
 // posting article
@@ -27,6 +27,7 @@ function WriteArticle() {
     const [content, setContent] = useState("");
     const [image, setImage] = useState(null);
     const data = new FormData();
+    const history = useHistory();
 
     const [err,setError] = useState(null);
 
@@ -35,7 +36,6 @@ function WriteArticle() {
             const config = tokenConfig();
             await axios.get(`${port}/api/auth/user`, config)
             .then(res=>{
-                data.append('username', res.data.username);
                 setUsername(res.data.username);
             })
             .catch(err=>{
@@ -51,7 +51,10 @@ function WriteArticle() {
 
     const handleSubmit = e =>{
         e.preventDefault();
+        data.append('username', username);
         postArticle(data);
+        history.push('/')
+        window.location.reload();
     }
     if(err == null){
         return(<div>

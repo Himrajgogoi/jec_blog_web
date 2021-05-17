@@ -6,6 +6,7 @@ import Header from "./common/Header";
 import Footer from "./common/Footer";
 import image from "../images/blog.jpg";
 import image1 from "../images/article.jpg";
+import { Loading } from "./common/Loading";
 
 function SpecificUser(props) {
 
@@ -13,6 +14,7 @@ function SpecificUser(props) {
     const [user_profile, setProfile] = useState(null);
     const [posted, setPosted] = useState([]);
     const [err, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(()=>{
 
@@ -25,14 +27,28 @@ function SpecificUser(props) {
               setUser(res.data);
               setProfile(res.data.user_profile)
               setPosted(res.data.posted)
+              setLoading(false);
             })
             .catch((err) => {
               setError("An error occured");
+              setLoading(false);
             });
         }
         getSpecificUser(props.id);
     },[])
-    if(err==null){
+    if(err==null && loading == false){
+        if(user == {}) return(
+            <div className="backcolor">
+            <Header />
+            <div>
+              <div className="content">
+                <h5 style={{ textAlign: "center", justifyContent: "center", color: "grey" }}>No user found.</h5>
+              </div>
+            </div>
+            <Footer />
+          </div>
+          )
+          else
         return (
             <div>
             <Header/>
@@ -63,9 +79,17 @@ function SpecificUser(props) {
               <Footer/>  
             </div>
         )
-    }
+    } else if (loading) {
+        return (
+          <div className="backcolor">
+            <Header />
+             <Loading/>
+            <Footer />
+          </div>
+        );
+      } 
 
-    else{
+    else if (err !== null && loading == false){
         return (
             <div className="backcolor">
                 <Header/>             

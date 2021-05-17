@@ -5,6 +5,8 @@ import axios from "axios";
 import Header from "./common/Header";
 import Footer from "./common/Footer";
 import { Link } from "react-router-dom";
+import image from "../images/article.jpg";
+import { Loading } from "./common/Loading";
 
 function SpecificArticle(props) {
   const [data, setData] = useState({});
@@ -12,6 +14,7 @@ function SpecificArticle(props) {
   const [profile, setProfile] = useState({});
   const [date, setDate] = useState(null);
   const [err, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getSpecificArticle(id) {
@@ -24,9 +27,11 @@ function SpecificArticle(props) {
           setData(res.data);
           setDate(res.data.createdAt);
           getSpecificUser(res.data.owner);
+          setLoading(false);
         })
         .catch((err) => {
           setError("An error occured");
+          setLoading(false);
         });
     }
 
@@ -39,14 +44,26 @@ function SpecificArticle(props) {
         .then((res) => {
             setOwner(res.data);
             setProfile(res.data.user_profile)
-        })
+          })
         .catch((err) => {
             setError("An error occured");
-        });
+          });
     }
     getSpecificArticle(props.id);
   }, []);
-  if (err == null) {
+  if (err == null && loading == false) {
+    if(data == {}) return(
+      <div className="backcolor">
+      <Header />
+      <div>
+        <div className="content">
+          <h5 style={{ textAlign: "center", justifyContent: "center", color: "grey" }}>No article found.</h5>
+        </div>
+      </div>
+      <Footer />
+    </div>
+    )
+    else
     return (
       <div>
         <Header />
@@ -91,10 +108,10 @@ function SpecificArticle(props) {
                     <p style={{ color: "grey" }}>
                       <b>Posted by:</b>
                     </p>
-                    <img src={profile.dp} className="img-fluid user"/>
+                    <img src={profile == null || profile.dp == null?image: profile.dp} className="img-fluid user"/>
                     <Link to={`/users/${owner.id}`}><h3>{owner.username}</h3></Link>
                     <i className="fa fa-envelope fa-lg"></i><p>{owner.email}</p>
-                    <p>{profile.bio}</p>
+                    <p>{profile == null || profile.bio == null?"No bio provided.": profile.bio}</p>
                   </div>
                 </div>
               </div>
@@ -104,7 +121,16 @@ function SpecificArticle(props) {
         <Footer />
       </div>
     );
-  } else {
+  } else if (loading) {
+    return (
+      <div className="backcolor">
+        <Header />
+         <Loading/>
+        <Footer />
+      </div>
+    );
+  } 
+  else if (err !== null && loading == false) {
     return (
       <div className="backcolor">
         <Header />

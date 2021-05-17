@@ -7,23 +7,22 @@ import { Link } from "react-router-dom";
 import { CardImg, Card, CardBody, CardHeader } from "reactstrap";
 import image from "../images/article.jpg";
 import Footer from "./common/Footer";
-
+import { Loading } from "./common/Loading";
 
 // delete article
-async function deleteArticle (id){
-
+async function deleteArticle(id) {
   const config = tokenConfig();
-  
-  axios.delete(`${port}/api/personal/${id}/`,config)
-  .then(res=>{
-      console.log("success");
-  })
-  .catch(err=>{
-      console.log("failed");
-  });
-  
-}
 
+  axios
+    .delete(`${port}/api/personal/${id}/`, config)
+    .then((res) => {
+      window.location.reload();
+      console.log("success");
+    })
+    .catch((err) => {
+      console.log("failed");
+    });
+}
 
 function DashBoard() {
   const [data, setData] = useState([]);
@@ -31,21 +30,23 @@ function DashBoard() {
   const [searched, setSearch] = useState([]);
   const [word, setWord] = useState("");
   const [err, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(function () {
     // recent articles
     async function getRecentArticles() {
       const config = tokenConfig();
-
-      axios
-        .get(`${port}/api/recent/`, config)
-        .then((res) => {
-          setData(res.data);
-        })
-        .catch((err) => {
-          localStorage.removeItem("token");
-          setError("An error occured. Try logging in again");
-        });
+     
+        axios
+          .get(`${port}/api/recent/`, config)
+          .then((res) => {
+            setData(res.data);
+            setLoading(false);
+          })
+          .catch((err) => {
+            setError("An error occured. Try logging in again");
+            setLoading(false);
+          });
     }
 
     async function getPersonalArticles() {
@@ -86,8 +87,19 @@ function DashBoard() {
     console.log(data);
   };
 
-  if (err == null) {
-    return (
+  if (err == null && loading == false) {
+    if(data == []) return(
+      <div className="backcolor">
+      <Header />
+      <div>
+        <div className="content">
+          <h5 style={{ textAlign: "center", justifyContent: "center", color: "grey" }}>Nothing has been posted yet.</h5>
+        </div>
+      </div>
+      <Footer />
+    </div>
+    )
+    else return (
       <div className="backcolor">
         <Header />
         <div className="row">
@@ -224,10 +236,18 @@ function DashBoard() {
                           </p>
                         </div>
                         <div className="col-1">
-                          <Link to={`/personal/${art.id}`} style={{color:"white"}}><i className="fa fa-edit fa-lg"></i></Link>
+                          <Link
+                            to={`/personal/${art.id}`}
+                            style={{ color: "white" }}
+                          >
+                            <i className="fa fa-edit fa-lg"></i>
+                          </Link>
                         </div>
                         <div className="col-1">
-                         <i className="fa fa-trash fa-lg" onClick={()=>deleteArticle(art.id)}></i>
+                          <i
+                            className="fa fa-trash fa-lg"
+                            onClick={() => deleteArticle(art.id)}
+                          ></i>
                         </div>
                       </div>
                     </CardHeader>
@@ -242,7 +262,15 @@ function DashBoard() {
         <Footer />
       </div>
     );
-  } else {
+  } else if (loading) {
+    return (
+      <div className="backcolor">
+        <Header />
+         <Loading/>
+        <Footer />
+      </div>
+    );
+  } else if (err !== null && loading == false) {
     return (
       <div className="backcolor">
         <Header />

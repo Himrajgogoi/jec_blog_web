@@ -5,6 +5,7 @@ import axios from "axios";
 import Header from './common/Header';
 import Footer from './common/Footer';
 import image from "../images/blog.jpg";
+import { Loading } from "./common/Loading";
 
 
 async function updateUser(id,username,email) {
@@ -37,6 +38,7 @@ async function postProfile(data){
 
 // updating profile
 async function putProfile(id,data){
+    console.log(data.get("dp"))
     const config = tokenConfig_multipart();
 
     axios.put(`${port}/api/user/profile/${id}/`,data,config)
@@ -54,6 +56,7 @@ function Profile() {
     const [user,setUser] = useState({});
     const [user_profile,setUserProfile] = useState({});
     const [err, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     
     /// taking in the inputs
@@ -61,7 +64,6 @@ function Profile() {
     const [email, setEmail] = useState(null);
     const [bio,setBio] = useState(" ");
     const [dp, setDp] = useState(null);
-    const [updated,setUpdated] = useState(false);
     const data = new FormData();
 
     useEffect(()=>{
@@ -71,13 +73,16 @@ function Profile() {
             .then(res=>{
                 setUser(res.data);
                 setUserProfile(res.data.user_profile);
+                console.log(user_profile.dp);
+                setLoading(false);
             })
             .catch(err=>{
                setError("An error occured.");
+               setLoading(false);
             });
         }
         loadUser();
-    },[updated])
+    },[])
 
     const addData = (key, value) =>{
         data.append(key,value);
@@ -88,17 +93,29 @@ function Profile() {
         console.log("handle Submit is called");
         await updateUser(user.id,username??user.username, email??user.email);
 
-        if(user_profile.bio == null && user_profile.dp == null){
+        if(user_profile== null){
             await postProfile(data);
         }
         else if(data != null){
            await putProfile(user_profile.id,data);
         }
-        setUpdated(true);
+        window.location.reload();
 
     }
     
-    if(err==null){
+    if(err==null && loading == false){
+        if(user == {}) return(
+            <div className="backcolor">
+            <Header />
+            <div>
+              <div className="content">
+                <h5 style={{ textAlign: "center", justifyContent: "center", color: "grey" }}>No user found.</h5>
+              </div>
+            </div>
+            <Footer />
+          </div>
+          )
+          else
         return (
             <div>
             <Header/>
@@ -109,7 +126,7 @@ function Profile() {
                           <h2>{user.username}</h2>
                      </div>
                      <div className="col-12 col-md-3 offset-md-4">
-                        <img className="img-fluid user" src={user_profile.dp} style={{borderRadius: "50%"}}></img>
+                        <img className="img-fluid user" src={user_profile == null || user_profile.dp == null?image: user_profile.dp} style={{borderRadius: "50%"}}></img>
                      </div>
                  </div>
                  <div className="row" style={{marginLeft: "4vw", marginBottom: "7vh"}}>
@@ -125,7 +142,7 @@ function Profile() {
                             </div>
                             <div className="form-group">
                                 <label for="bio">Bio</label>
-                                <input type="text" placeholder={user_profile.bio} className="form-control" id="bio"  onChange={e=>addData("bio", e.target.value)}/>
+                                <input type="text" placeholder={user_profile == null || user_profile.bio == null?"No bio provided.": user_profile.bio} className="form-control" id="bio"  onChange={e=>addData("bio", e.target.value)}/>
                             </div>
                             <div className="form-group">
                                 <label for="dp">Dp</label>
@@ -142,9 +159,17 @@ function Profile() {
               <Footer/>  
             </div>
         )
-    }
+    } else if (loading) {
+        return (
+          <div className="backcolor">
+            <Header />
+             <Loading/>
+            <Footer />
+          </div>
+        );
+      } 
 
-    else{
+    else if (err !== null && loading == false){
         return (
             <div className="backcolor">
                 <Header/>             

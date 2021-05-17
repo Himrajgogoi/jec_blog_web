@@ -6,12 +6,14 @@ import axios from "axios";
 import image from "../images/article.jpg";
 import Footer from "./common/Footer";
 import { Link } from "react-router-dom";
+import { Loading } from "./common/Loading";
 
 function Users() {
   const [data, setData] = useState([]);
   const [searched, setSearch] = useState([]);
   const [err, setError] = useState(null);
   const [user, setUser] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // all users
@@ -21,11 +23,12 @@ function Users() {
       axios
         .get(`${port}/api/users/`, config)
         .then((res) => {
-          console.log(res.data);
           setData(res.data);
+          setLoading(false);
         })
         .catch((err) => {
           setError("An error occured");
+          setLoading(false);
         });
     }
     getAllUsers();
@@ -51,7 +54,19 @@ function Users() {
     );
     console.log(data);
   };
-  if (err == null) {
+  if (err == null && loading == false) {
+    if(data == []) return(
+      <div className="backcolor">
+      <Header />
+      <div>
+        <div className="content">
+          <h5 style={{ textAlign: "center", justifyContent: "center", color: "grey" }}>No user found.</h5>
+        </div>
+      </div>
+      <Footer />
+    </div>
+    )
+    else
     return (
       <div>
         <Header />
@@ -180,7 +195,17 @@ function Users() {
         <Footer />
       </div>
     );
-  } else {
+  } else if (loading) {
+    return (
+      <div className="backcolor">
+        <Header />
+         <Loading/>
+        <Footer />
+      </div>
+    );
+  } 
+  
+  else if (err !== null && loading == false) {
     return (
       <div className="backcolor">
         <Header />
